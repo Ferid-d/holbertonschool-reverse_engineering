@@ -40,14 +40,14 @@ fi
 # 4. Extract the required data using readelf
 header=$(readelf -h "$file_name")
 
-# Magic Number (pulled directly from readelf's "Magic:" line)
-magic_number=$(echo "$header" | grep "Magic:" | sed -E 's/.*Magic:[[:space:]]+//')
+# Magic Number (pulled directly from readelf's "Magic:" line, trailing space trimmed)
+magic_number=$(echo "$header" | grep "Magic:" | sed -E 's/.*Magic:[[:space:]]+//' | sed -E 's/[[:space:]]+$//')
 
 # Class (32-bit / 64-bit)
 class=$(echo "$header" | grep "Class:" | awk -F': ' '{print $2}' | sed 's/^[[:space:]]*//')
 
-# Byte Order (endianness)
-byte_order=$(echo "$header" | grep "Data:" | awk -F': ' '{print $2}' | sed 's/^[[:space:]]*//')
+# Byte Order (just "little endian" or "big endian")
+byte_order=$(echo "$header" | grep "Data:" | grep -oE '(little|big) endian')
 
 # Entry Point Address
 entry_point_address=$(echo "$header" | grep "Entry point address:" | awk -F': ' '{print $2}' | sed 's/^[[:space:]]*//')
